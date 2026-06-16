@@ -1,19 +1,29 @@
 # NgNeat Elf Docs Archive
 
-Restored documentation for the Elf-related packages used by our application.
+Restored Docusaurus documentation for NgNeat Elf.
 
-The original public `ngneat/elf` repository and `https://ngneat.github.io/elf/` docs are no longer reliable, while the npm packages are still used in the main project. This repository keeps a deployable Docusaurus copy of the docs that match our dependency versions.
+The original public `ngneat/elf` repository and `https://ngneat.github.io/elf/` docs are no longer reliable, while the npm packages are still used in the main project. This repository keeps a deployable copy of the archived docs so the team has a stable reference.
 
-## Covered Packages
+## What This Contains
+
+This is the full Elf Docusaurus docs app copied from [`ngneat-archive/elf`, branch `restore/npm-elf-cli-3.1.1`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1/docs).
+
+It was not reduced to only the pages we currently need. The archive includes the broader Elf documentation: store, repository/facade patterns, entities, requests, requests result, pagination, persist state, history, devtools, immer, CLI, side effects, miscellaneous APIs, recipes, troubleshooting, and third-party docs such as `elf-sync-state`.
+
+The branch name comes from the archive restoration branch. Even though it references `elf-cli`, the package manifests in that branch match the Elf package versions used by our application.
+
+## Version Match
 
 | Package | Version | Source |
 | --- | --- | --- |
-| `@ngneat/elf` | `2.5.1` | [`ngneat-archive/elf`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1) |
-| `@ngneat/elf-entities` | `5.0.2` | [`ngneat-archive/elf`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1) |
-| `@ngneat/elf-requests` | `1.9.2` | [`ngneat-archive/elf`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1) |
-| `@ngneat/elf-persist-state` | `1.2.1` | [`ngneat-archive/elf`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1) |
+| `@ngneat/elf` | `2.5.1` | [`packages/store/package.json`](https://github.com/ngneat-archive/elf/blob/restore/npm-elf-cli-3.1.1/packages/store/package.json) |
+| `@ngneat/elf-entities` | `5.0.2` | [`packages/entities/package.json`](https://github.com/ngneat-archive/elf/blob/restore/npm-elf-cli-3.1.1/packages/entities/package.json) |
+| `@ngneat/elf-requests` | `1.9.2` | [`packages/requests/package.json`](https://github.com/ngneat-archive/elf/blob/restore/npm-elf-cli-3.1.1/packages/requests/package.json) |
+| `@ngneat/elf-persist-state` | `1.2.1` | [`packages/persist-state/package.json`](https://github.com/ngneat-archive/elf/blob/restore/npm-elf-cli-3.1.1/packages/persist-state/package.json) |
 | `@ngneat/error-tailor` | `5.0.1` | [`ngneat-archive/error-tailor`](https://github.com/ngneat-archive/error-tailor/tree/restore/npm-error-tailor-5.0.1) |
 | `elf-sync-state` | `1.3.0` | [`RicardoJBarrios/elf-sync-state`](https://github.com/RicardoJBarrios/elf-sync-state) |
+
+The first four packages above are verified directly from the archived Elf monorepo branch. `@ngneat/error-tailor` is restored from its separate archive. `elf-sync-state` is documented from its own repository and the third-party page included in the Elf docs archive.
 
 ## Important Source Pages
 
