@@ -2,7 +2,7 @@
 
 This is the Docusaurus app for the restored Elf documentation archive.
 
-See the repository root `README.md` for the package versions, archive links, and Railway deployment settings.
+See the repository root `README.md` for the package versions and archive links.
 
 ## Installation
 

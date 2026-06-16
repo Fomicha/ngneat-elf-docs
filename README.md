@@ -41,16 +41,3 @@ cd docs
 npm ci
 npm run build
 ```
-
-## Railway
-
-Railway service settings:
-
-```txt
-Root Directory: docs
-Build Command: npm ci && npm run build
-Start Command: npm run serve -- --host 0.0.0.0 --port $PORT
-```
-
-The Docusaurus `baseUrl` is configured as `/`, so the Railway deployment should work from the root of the generated domain.
-
