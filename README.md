@@ -6,6 +6,12 @@ The original public `ngneat/elf` repository and `https://ngneat.github.io/elf/` 
 
 This repository keeps a deployable copy of the archived Docusaurus docs so teams maintaining Elf-based applications can keep a stable reference.
 
+## Live Documentation
+
+The restored docs are available at:
+
+https://ngneat-elf-docs-production.up.railway.app/
+
 ## What This Contains
 
 This is the full Elf Docusaurus docs app copied from [`ngneat-archive/elf`, branch `restore/npm-elf-cli-3.1.1`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1/docs).
