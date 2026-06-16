@@ -1,18 +1,20 @@
-# NgNeat Elf Docs Archive
+# NgNeat Elf Documentation Archive
 
-Restored Docusaurus documentation for NgNeat Elf.
+Unofficial restored documentation archive for [NgNeat Elf](https://www.npmjs.com/package/@ngneat/elf) and related packages.
 
-The original public `ngneat/elf` repository and `https://ngneat.github.io/elf/` docs are no longer reliable, while the npm packages are still used in the main project. This repository keeps a deployable copy of the archived docs so the team has a stable reference.
+The original public `ngneat/elf` repository and `https://ngneat.github.io/elf/` documentation are no longer reliable, while the npm packages are still available and may still be used by existing projects.
+
+This repository keeps a deployable copy of the archived Docusaurus docs so teams maintaining Elf-based applications can keep a stable reference.
 
 ## What This Contains
 
 This is the full Elf Docusaurus docs app copied from [`ngneat-archive/elf`, branch `restore/npm-elf-cli-3.1.1`](https://github.com/ngneat-archive/elf/tree/restore/npm-elf-cli-3.1.1/docs).
 
-It was not reduced to only the pages we currently need. The archive includes the broader Elf documentation: store, repository/facade patterns, entities, requests, requests result, pagination, persist state, history, devtools, immer, CLI, side effects, miscellaneous APIs, recipes, troubleshooting, and third-party docs such as `elf-sync-state`.
+It was not reduced to a small subset. The archive includes the broader Elf documentation: store, repository/facade patterns, entities, requests, requests result, pagination, persist state, history, devtools, immer, CLI, side effects, miscellaneous APIs, recipes, troubleshooting, and third-party docs such as `elf-sync-state`.
 
-The branch name comes from the archive restoration branch. Even though it references `elf-cli`, the package manifests in that branch match the Elf package versions used by our application.
+The branch name comes from the archive restoration branch. Even though it references `elf-cli`, the package manifests in that branch provide a useful version snapshot for the Elf packages listed below.
 
-## Version Match
+## Version Snapshot
 
 | Package | Version | Source |
 | --- | --- | --- |
@@ -24,6 +26,8 @@ The branch name comes from the archive restoration branch. Even though it refere
 | `elf-sync-state` | `1.3.0` | [`RicardoJBarrios/elf-sync-state`](https://github.com/RicardoJBarrios/elf-sync-state) |
 
 The first four packages above are verified directly from the archived Elf monorepo branch. `@ngneat/error-tailor` is restored from its separate archive. `elf-sync-state` is documented from its own repository and the third-party page included in the Elf docs archive.
+
+If your project depends on similar Elf versions, this archive may be useful as a historical reference. It is not an official continuation of NgNeat Elf.
 
 ## Important Source Pages
 
