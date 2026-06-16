@@ -1,0 +1,404 @@
+# Error Tailor
+
+`@ngneat/error-tailor` handles Angular form errors without repeating the same display boilerplate for every field. It can render messages automatically on blur, on async validation, on change, or after submit, and it lets each application control the error text, component, anchor, and CSS classes.
+
+This page is based on the archived `@ngneat/error-tailor@5.0.1` README.
+
+## Installation
+
+```bash
+npm install @ngneat/error-tailor
+```
+
+Configure the global error messages with `provideErrorTailorConfig`:
+
+```ts
+import { provideErrorTailorConfig } from '@ngneat/error-tailor';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideErrorTailorConfig({
+      errors: {
+        useValue: {
+          required: 'This field is required',
+          minlength: ({ requiredLength, actualLength }) =>
+            `Expect ${requiredLength} but got ${actualLength}`,
+          invalidAddress: (error) => `Address isn't valid`,
+        },
+      },
+    }),
+  ],
+});
+```
+
+The `errors` config property accepts a partial provider. It should resolve to a map where each key is a validation error name and each value is either a string or a function that returns the message.
+
+## Basic Usage
+
+Add the `errorTailor` directive to the form:
+
+```html
+<form [formGroup]="form" errorTailor>
+  <div class="form-group">
+    <input class="form-control" formControlName="name" placeholder="Name" />
+  </div>
+
+  <section formGroupName="address">
+    <div class="form-group">
+      <input class="form-control" formControlName="city" placeholder="City" />
+    </div>
+
+    <div class="form-group">
+      <input
+        class="form-control"
+        formControlName="country"
+        placeholder="Country"
+      />
+    </div>
+  </section>
+
+  <button class="btn btn-success">Submit</button>
+</form>
+```
+
+Import the standalone helpers together with Angular forms:
+
+```ts
+import { Component, inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { errorTailorImports } from '@ngneat/error-tailor';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [errorTailorImports, ReactiveFormsModule],
+  templateUrl: './app.component.html',
+})
+export class AppComponent {
+  private builder = inject(FormBuilder);
+
+  form = this.builder.group({
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    terms: [false, Validators.requiredTrue],
+    address: this.builder.group({
+      city: ['', Validators.required],
+      country: [''],
+    }),
+  });
+}
+```
+
+By default, errors are shown when a field blurs and when the form is submitted.
+
+## Inputs
+
+### `controlErrorsClass`
+
+Adds CSS classes to the rendered control error component:
+
+```html
+<input
+  class="form-control"
+  formControlName="city"
+  placeholder="City"
+  controlErrorsClass="my-class other-class"
+/>
+```
+
+### `controlCustomClass`
+
+Adds CSS classes to the form control while it has an error:
+
+```html
+<input
+  class="form-control"
+  formControlName="city"
+  placeholder="City"
+  controlCustomClass="my-custom-class other-custom-class"
+/>
+```
+
+### `controlErrorsTpl`
+
+Uses a custom template instead of the default control error view:
+
+```html
+<form errorTailor>
+  <ng-template let-error let-text="text" #tpl>
+    {{ error | json }} {{ text }}
+  </ng-template>
+
+  <input
+    class="form-control"
+    ngModel
+    required
+    name="name"
+    [controlErrorsTpl]="tpl"
+  />
+</form>
+```
+
+### `controlErrorAnchor`
+
+Sets a custom anchor for the error component. The default anchor is the form field element:
+
+```html
+<div class="form-check form-group">
+  <input
+    type="checkbox"
+    formControlName="terms"
+    id="terms"
+    [controlErrorAnchor]="anchor"
+  />
+  <label class="form-check-label" for="terms">
+    I agree to the terms and conditions
+  </label>
+  <ng-template controlErrorAnchor #anchor="controlErrorAnchor"></ng-template>
+</div>
+```
+
+The anchor can also wrap nested form fields:
+
+```html
+<div class="form-check form-group" controlErrorAnchor>
+  <input type="checkbox" formControlName="terms" id="terms" />
+  <label class="form-check-label" for="terms">
+    I agree to the terms and conditions
+  </label>
+</div>
+```
+
+### `controlErrors`
+
+Provides extra field-level errors that are not in the global config:
+
+```html
+<input
+  class="form-control"
+  formControlName="country"
+  placeholder="Country"
+  [controlErrors]="extraErrors"
+/>
+```
+
+### `controlErrorsIgnore`
+
+Skips creation of the control error component for a field. This is useful for radio groups where one error message is enough:
+
+```html
+<input
+  type="radio"
+  name="languages"
+  formControlName="languages"
+  value="en"
+  id="en"
+  [controlErrorAnchor]="anchorRadio"
+/>
+<label for="en">English</label>
+
+<input
+  type="radio"
+  name="languages"
+  formControlName="languages"
+  value="de"
+  id="de"
+  controlErrorsIgnore
+/>
+<label for="de">German</label>
+
+<ng-template controlErrorAnchor #anchorRadio="controlErrorAnchor"></ng-template>
+```
+
+### Display timing inputs
+
+Use these inputs to override when errors are displayed:
+
+```html
+<input [controlErrorsOnAsync]="false" formControlName="name" />
+<input [controlErrorsOnBlur]="false" formControlName="name" />
+<input [controlErrorsOnChange]="true" formControlName="name" />
+```
+
+To show errors only on submit, disable both blur and async handling:
+
+```html
+<input
+  [controlErrorsOnBlur]="false"
+  [controlErrorsOnAsync]="false"
+  formControlName="name"
+/>
+```
+
+## Methods
+
+The `errorTailor` directive can be exported and controlled programmatically.
+
+```html
+<input type="checkbox" formControlName="gdpr" #gdprErrorTailor="errorTailor" />
+```
+
+```ts
+import { ViewChild } from '@angular/core';
+import { ControlErrorsDirective } from '@ngneat/error-tailor';
+
+@ViewChild('gdprErrorTailor', { static: true })
+gdprErrorTailor!: ControlErrorsDirective;
+
+showGdprError() {
+  this.gdprErrorTailor.showError();
+}
+
+hideGdprError() {
+  this.gdprErrorTailor.hideError();
+}
+```
+
+## CSS Styling
+
+The library adds `form-submitted` to the submitted form. You can use it to style invalid inputs:
+
+```css
+.form-submitted input.ng-invalid,
+.form-submitted select.ng-invalid {
+  border-color: #dc3545;
+}
+
+.control-error {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 12px;
+  color: #dc3545;
+}
+```
+
+## Config
+
+### `blurPredicate`
+
+Controls which elements listen to the `focusout` event:
+
+```ts
+provideErrorTailorConfig({
+  blurPredicate(element) {
+    return element.tagName === 'INPUT' || element.tagName === 'SELECT';
+  },
+});
+```
+
+### `controlClassOnly`
+
+When `true`, no error component is created and only the error class is added to the control.
+
+### `controlErrorsClass`
+
+Sets global classes for the error component. A field-level `controlErrorsClass` input can override it.
+
+### `controlCustomClass`
+
+Sets global classes for invalid controls. A field-level `controlCustomClass` input can override it.
+
+### `controlErrorComponent`
+
+Replaces the default error component. The replacement component should implement the `ControlErrorComponent` interface.
+
+```ts
+import { Component } from '@angular/core';
+import {
+  DefaultControlErrorComponent,
+  errorTailorImports,
+  provideErrorTailorConfig,
+} from '@ngneat/error-tailor';
+
+@Component({
+  standalone: true,
+  imports: [errorTailorImports],
+  selector: 'app-ionic-control-error',
+  template: `
+    <ion-item lines="none" class="ion-text-wrap" [class.hide-control]="hideError">
+      <ion-label color="danger" class="ion-no-margin ion-text-wrap" stacked>
+        {{ errorText }}
+      </ion-label>
+    </ion-item>
+  `,
+})
+export class IonicControlErrorComponent extends DefaultControlErrorComponent {}
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideErrorTailorConfig({
+      errors: {
+        useValue: {
+          required: 'This field is required',
+        },
+      },
+      controlErrorComponent: IonicControlErrorComponent,
+    }),
+  ],
+});
+```
+
+### `controlErrorComponentAnchorFn`
+
+Lets you reposition the rendered error component in the DOM. The hook receives the host element and the error element and should return a cleanup callback.
+
+```ts
+function anchorIonicErrorComponent(hostElement: Element, errorElement: Element) {
+  hostElement.parentElement?.insertAdjacentElement('afterend', errorElement);
+
+  return () => {
+    const errorNode = hostElement.parentElement?.querySelector(
+      'app-ionic-control-error',
+    );
+
+    errorNode?.remove();
+  };
+}
+
+provideErrorTailorConfig({
+  errors: {
+    useValue: {
+      required: 'This field is required',
+    },
+  },
+  controlErrorComponent: IonicControlErrorComponent,
+  controlErrorComponentAnchorFn: anchorIonicErrorComponent,
+});
+```
+
+### `controlErrorsOn`
+
+Overrides the default display behavior:
+
+```ts
+provideErrorTailorConfig({
+  controlErrorsOn: {
+    async: true,
+    blur: true,
+    change: false,
+  },
+});
+```
+
+## Recipes
+
+### I18n
+
+```ts
+import { TranslocoService } from '@ngneat/transloco';
+
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideErrorTailorConfig({
+      errors: {
+        useFactory(service: TranslocoService) {
+          return {
+            required: () => service.translate('errors.required'),
+          };
+        },
+        deps: [TranslocoService],
+      },
+    }),
+  ],
+});
+```
+

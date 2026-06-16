@@ -1,0 +1,193 @@
+# Requests Result
+
+import index from '!!raw-loader!@site/docs/examples/requests-result.ex';
+import { LiveDemo } from '@site/components/LiveDemo';
+
+Elf provides a convenient way to track the `status` of async requests and combine it with your store selectors. First, you need to install the package by
+using the CLI command `elf-cli install` and selecting the requests package, or via npm:
+
+```bash
+npm i @ngneat/elf-requests
+```
+
+Now, simply add to your source request the `trackRequestResult` operator, and give it a unique `key`:
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos']),
+  );
+}
+```
+
+Now, we can use the `joinRequestResult` operator with our store selectors:
+
+```ts title="todos.repository"
+import { createStore } from '@ngneat/elf';
+import { withEntities } from '@ngneat/elf-entities';
+import { joinRequestResult } from '@ngneat/elf-requests';
+
+interface Todo {
+  id: number;
+  label: string;
+}
+
+const todosStore = createStore({ name: 'todos' }, withEntities<Todo>());
+
+export const entities$ = store.pipe(
+  selectAllEntities(),
+  // highlight-next-line
+  joinRequestResult(['todos']),
+);
+```
+
+The `entities$` selector will now track the `todos` request and will provide the following information:
+
+```ts
+entities$.subscribe(
+  ({ isLoading, isError, isSuccess, data, error, status }) => {
+    console.log(
+      isLoading,
+      isError,
+      isSuccess,
+      status,
+      successfulRequestsCount,
+      data, // typed as Todo[]
+      error,
+    );
+  },
+);
+```
+
+<LiveDemo src={index} packages={['entities', 'requests']} />
+<br />
+
+We can also initialize the selector as `idle` by using `joinRequestResult(['todos'], { initialStatus: 'idle' })`
+
+Here is an example of a `dynamic` selector:
+
+```ts
+export const selectTodo = (id: Todo['id]) => store.pipe(
+  selectEntity(id),
+  // highlight-next-line
+  joinRequestResult(['todos', id])
+);
+```
+
+### Additional Options
+
+- `staleTime` - When we should refetch
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos'], { staleTime: 10_000 }),
+  );
+}
+```
+
+- `skipCache` - Ignore everything and perform the request
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos'], { skipCache: true }),
+  );
+}
+```
+
+- `preventConcurrentRequest` - Don't perform the request if there is a pending request, defaults to `true`
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos'], { preventConcurrentRequest: false }),
+  );
+}
+```
+
+- `cacheResponseData` - Cache the response data and emit it as responseData for skipped requests, defaults to `false`
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos'], { cacheResponseData: true }),
+  );
+}
+
+fetchTodos().subscribe((todos) => {
+  // This will be called with the cached result, or once the request is completed
+});
+```
+
+- `additionalKeys` - Cache the request result for additional keys, e.g. based on properties from the response data
+
+```ts title="todos.service.ts"
+import { trackRequestResult } from '@ngneat/elf-requests';
+import { setTodos } from './todos.repository';
+
+export function fetchTodos() {
+  return http.get(todosUrl).pipe(
+    tap(setTodos),
+    // highlight-next-line
+    trackRequestResult(['todos'], {
+      additionalKeys: (todos) => todos.map((todo) => ['todos', todo.id]),
+    }),
+  );
+}
+```
+
+### Operators
+
+```ts
+import { filterSuccess, filterError } from '@ngneat/elf-requests';
+
+entities$.pipe(filterSuccess()).subscribe((result) => {
+  // This will be called only upon success
+});
+
+entities$.pipe(filterError()).subscribe((result) => {
+  // This will be called only upon error
+});
+
+entities$
+  .pipe(
+    mapResultData((data) => {
+      // This will be called only when data is defined (not `null` or `undefined`)
+      return data.filter((todo) => todo.id === 1);
+    }),
+  )
+  .subscribe((result) => {});
+```
+
+### API
+
+- `getRequestResult` - `getRequestResult(key): Observable<RequestResult>`
+- `deleteRequestResult` - `deleteRequestResult(key): void`
+- `resetStaleTime` - `resetStaleTime(key): void`
+- `clearRequestsResult` - `clearRequestsResult(): void`
